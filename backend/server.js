@@ -1,5 +1,5 @@
-// Express server with Socket.IO integration, CORS, Firebase Auth, and health-check route
-// Enhanced with Firebase JWT validation and authenticated real-time communication
+// Express server with Socket.IO integration, CORS, Firebase Auth, MongoDB, and room management
+// Enhanced with room system, mood tracking, and real-time messaging
 
 const express = require('express');
 const http = require('http');
@@ -11,11 +11,29 @@ require('dotenv').config();
 const { initializeFirebase, getFirebaseAuth, getFirestore } = require('./firebase-admin');
 const { verifyFirebaseToken, optionalAuth } = require('./middleware/auth');
 
+// MongoDB
+const { connectDB } = require('./database');
+const Room = require('./models/Room');
+
+// Room handlers
+const {
+  handleCreateRoom,
+  handleJoinRoom,
+  handleLeaveRoom,
+  handleUpdateMood,
+  handleSendMessage,
+  handleGetRooms,
+  handleDisconnect
+} = require('./handlers/roomHandlers');
+
 const app = express();
 const server = http.createServer(app);
 
 // Initialize Firebase Admin SDK
 initializeFirebase();
+
+// Connect to MongoDB
+connectDB();
 
 // Configure Socket.IO with CORS
 const io = socketIo(server, {
@@ -42,7 +60,8 @@ app.get('/health', (req, res) => {
     message: 'Server is running',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    firebase: getFirebaseAuth() ? 'Connected' : 'Not Connected'
+    firebase: getFirebaseAuth() ? 'Connected' : 'Not Connected',
+    mongodb: require('mongoose').connection.readyState === 1 ? 'Connected' : 'Disconnected'
   });
 });
 
@@ -92,6 +111,59 @@ app.get('/api/profile', verifyFirebaseToken, async (req, res) => {
     console.error('Error fetching profile:', error);
     res.status(500).json({
       error: 'Failed to fetch profile'
+    });
+  }
+});
+
+app.get('/api/rooms', verifyFirebaseToken, async (req, res) => {
+  try {
+    const rooms = await Room.findActiveRooms();
+    
+    const roomList = rooms.map(room => ({
+      roomId: room.roomId,
+      name: room.name,
+      description: room.description,
+      participantCount: room.participants ? room.participants.filter(p => p.isOnline).length : 0,
+      lastActivity: room.lastActivity,
+      createdAt: room.createdAt
+    }));
+
+    res.json({
+      rooms: roomList,
+      count: roomList.length
+    });
+  } catch (error) {
+    console.error('Error fetching rooms:', error);
+    res.status(500).json({
+      error: 'Failed to fetch rooms'
+    });
+  }
+});
+
+app.get('/api/rooms/:roomId', verifyFirebaseToken, async (req, res) => {
+  try {
+    const { roomId } = req.params;
+    const room = await Room.findByRoomId(roomId);
+    
+    if (!room) {
+      return res.status(404).json({
+        error: 'Room not found'
+      });
+    }
+
+    res.json({
+      roomId: room.roomId,
+      name: room.name,
+      description: room.description,
+      participants: room.participants.filter(p => p.isOnline),
+      messages: room.getRecentMessages(20),
+      createdAt: room.createdAt,
+      lastActivity: room.lastActivity
+    });
+  } catch (error) {
+    console.error('Error fetching room:', error);
+    res.status(500).json({
+      error: 'Failed to fetch room'
     });
   }
 });
@@ -169,7 +241,7 @@ io.use(async (socket, next) => {
   }
 });
 
-// Socket.IO connection handling with authentication
+// Socket.IO connection handling with authentication and room management
 io.on('connection', (socket) => {
   console.log('New client connected:', socket.id);
   
@@ -189,9 +261,17 @@ io.on('connection', (socket) => {
     });
   }
 
-  // Handle incoming messages
+  // Room management events
+  socket.on('createRoom', (data) => handleCreateRoom(socket, data));
+  socket.on('joinRoom', (data) => handleJoinRoom(socket, data));
+  socket.on('leaveRoom', (data) => handleLeaveRoom(socket, data));
+  socket.on('updateMood', (data) => handleUpdateMood(socket, data));
+  socket.on('sendMessage', (data) => handleSendMessage(socket, data));
+  socket.on('getRooms', () => handleGetRooms(socket));
+
+  // Legacy message handling (for backward compatibility)
   socket.on('message', (data) => {
-    console.log('Message received:', data);
+    console.log('Legacy message received:', data);
     
     const messageData = {
       type: 'user',
@@ -207,43 +287,8 @@ io.on('connection', (socket) => {
     io.emit('message', messageData);
   });
 
-  // Handle room operations (authenticated users only)
-  socket.on('join-room', (room) => {
-    if (!socket.isAuthenticated) {
-      socket.emit('error', 'Authentication required to join rooms');
-      return;
-    }
-    
-    socket.join(room);
-    console.log(`User ${socket.user.email} joined room: ${room}`);
-    socket.to(room).emit('message', {
-      type: 'system',
-      text: `${socket.user.displayName} joined the room`,
-      timestamp: new Date()
-    });
-  });
-
-  socket.on('leave-room', (room) => {
-    if (!socket.isAuthenticated) {
-      return;
-    }
-    
-    socket.leave(room);
-    console.log(`User ${socket.user.email} left room: ${room}`);
-    socket.to(room).emit('message', {
-      type: 'system',
-      text: `${socket.user.displayName} left the room`,
-      timestamp: new Date()
-    });
-  });
-
   // Handle disconnection
-  socket.on('disconnect', (reason) => {
-    console.log('Client disconnected:', socket.id, 'Reason:', reason);
-    if (socket.isAuthenticated) {
-      console.log('User disconnected:', socket.user.email);
-    }
-  });
+  socket.on('disconnect', (reason) => handleDisconnect(socket, reason));
 });
 
 // Error handling middleware
@@ -269,8 +314,9 @@ server.listen(PORT, () => {
 🚀 ProjectMood Backend Server Running!
 📍 Port: ${PORT}
 🌐 Health Check: http://localhost:${PORT}/health
-🔌 Socket.IO: Enabled with Firebase Auth
+🔌 Socket.IO: Enabled with Firebase Auth & Room System
 🔥 Firebase: ${getFirebaseAuth() ? '✅ Connected' : '❌ Not Connected'}
+🍃 MongoDB: ${require('mongoose').connection.readyState === 1 ? '✅ Connected' : '❌ Disconnected'}
 ⏰ Started: ${new Date().toLocaleString()}
   `);
 });

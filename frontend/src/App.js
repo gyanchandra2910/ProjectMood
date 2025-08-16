@@ -1,5 +1,5 @@
-// Main App component with authentication and routing
-// Integrates Firebase Auth with React Router and Socket.IO
+// Main App component with authentication, routing, and room system
+// Integrates Firebase Auth with React Router, Socket.IO, and room management
 
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
@@ -8,6 +8,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Login from './components/Login';
 import Profile from './components/Profile';
 import Home from './components/Home';
+import Rooms from './components/Rooms';
+import Room from './components/Room';
 
 function App() {
   return (
@@ -29,6 +31,22 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/rooms" 
+              element={
+                <ProtectedRoute>
+                  <Rooms />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/room/:roomId" 
+              element={
+                <ProtectedRoute>
+                  <Room />
                 </ProtectedRoute>
               } 
             />
