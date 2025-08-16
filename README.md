@@ -19,6 +19,16 @@ A real-time communication application built with React, Tailwind CSS, Node.js, E
 - **📊 Mood Confidence Tracking**: AI-generated confidence scores for detected emotions
 - **🛡️ Privacy-First Design**: Local processing with optional server enhancement
 
+### Stage 4: Music Integration & Room Connections
+- **🎵 Music Streaming Platform**: Mood-based music discovery and streaming
+- **🏠 Room Connection System**: Connect multiple rooms with intelligent mood blending
+- **🎯 DJ Battle Engine**: Real-time competitive music experiences with live voting
+- **🔍 Ambient Room Matching**: Discover compatible rooms using cosine similarity algorithms
+- **🌍 Cross-Room Communication**: Real-time chat and interaction between connected rooms
+- **🎨 Mood Blending Algorithms**: Sophisticated audio analysis and mood fusion
+- **👤 Anonymous Profile System**: Privacy-protected room discovery
+- **📊 Engagement Analytics**: Track user engagement and battle performance
+
 ### Technical Features
 - **🎨 Modern UI**: Clean and responsive design with Tailwind CSS
 - **🛡️ Secure Backend**: Firebase JWT validation middleware
@@ -26,11 +36,47 @@ A real-time communication application built with React, Tailwind CSS, Node.js, E
 - **📊 Health Monitoring**: Built-in health check endpoints
 - **📱 Progressive Enhancement**: Graceful fallbacks for unsupported features
 
+## 🎵 Quick Start for Room Connections
+
+For the new music integration and room connection features:
+
+### Installation with Room Connections
+```bash
+# Use the handy starter script
+node start.js install-deps
+
+# Or manually:
+cd backend && npm install
+cd ../frontend && npm install --legacy-peer-deps
+```
+
+### Start with Music Features
+```bash
+# Terminal 1: Start Backend (includes Socket.IO for room connections)
+node start.js start-server
+
+# Terminal 2: Start Frontend (includes room connection UI)
+node start.js start-frontend
+
+# Terminal 3: Test the room connection demo
+node start.js run-demo
+```
+
+### Room Connection Features
+- **Room Merging**: Connect rooms and blend their moods intelligently
+- **DJ Battles**: 90-second competitive music experiences
+- **Ambient Matching**: Find compatible rooms automatically
+- **Real-Time Collaboration**: Socket.IO powered interactions
+
+For detailed documentation on room connections, see [Room Connections Documentation](docs/ROOM_CONNECTIONS.md).
+
 ## 📋 Prerequisites
 
 - Node.js (v16 or higher)
 - npm or yarn package manager
 - Firebase project (free tier available)
+- MongoDB (for room connections and music data)
+- Optional: Spotify API keys for enhanced music features
 
 ## � Firebase Setup
 
@@ -86,6 +132,13 @@ FIREBASE_PROJECT_ID=your-firebase-project-id
 
 # Add your Firebase service account key (one line, escaped JSON)
 FIREBASE_SERVICE_ACCOUNT_KEY={"type":"service_account","project_id":"..."}
+
+# MongoDB for room connections and music data
+MONGODB_URI=mongodb://localhost:27017/moodfusion
+
+# Optional: Spotify API for enhanced music features
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_CLIENT_SECRET=your_spotify_client_secret
 ```
 
 ### 3. Frontend Setup
@@ -104,6 +157,10 @@ REACT_APP_FIREBASE_PROJECT_ID=your-project-id
 REACT_APP_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=123456789
 REACT_APP_FIREBASE_APP_ID=1:123456789:web:abcdef
+
+# Backend API endpoints
+REACT_APP_API_URL=http://localhost:3001
+REACT_APP_SOCKET_URL=http://localhost:3001
 ```
 
 ## 🏃‍♂️ Running the Application
@@ -153,6 +210,9 @@ ProjectMood/
 │   │   │   ├── Home.js          # Main dashboard with chat
 │   │   │   ├── Login.js         # Authentication component
 │   │   │   ├── Profile.js       # User profile management
+│   │   │   ├── Room.js          # Room interface with music features
+│   │   │   ├── RoomConnectionPanel.js # Room connection UI
+│   │   │   ├── RoomConnectionPanel.css # Styling for connections
 │   │   │   └── ProtectedRoute.js # Route protection
 │   │   ├── contexts/
 │   │   │   └── AuthContext.js   # Firebase auth context
@@ -165,11 +225,25 @@ ProjectMood/
 ├── backend/                      # Node.js/Express server
 │   ├── middleware/
 │   │   └── auth.js              # Firebase JWT middleware
+│   ├── services/                # Business logic services
+│   │   ├── roomConnection.js    # Room merging & DJ battles
+│   │   ├── ambientMatching.js   # Room discovery algorithm
+│   │   └── roomConnectionSockets.js # Real-time Socket.IO events
+│   ├── routes/                  # API endpoints
+│   │   └── roomConnectionRoutes.js # Room connection REST API
+│   ├── models/                  # MongoDB schemas
+│   ├── tests/                   # Test suites
+│   │   └── roomConnectionTest.js # Comprehensive testing
+│   ├── demo/                    # Demo scripts
+│   │   └── roomConnectionDemo.js # Feature demonstration
 │   ├── firebase-admin.js        # Firebase Admin SDK config
-│   ├── server.js                # Main server file
+│   ├── app.js                   # Main server file with Socket.IO
 │   ├── .env.example             # Backend environment template
 │   └── package.json
+├── docs/                        # Documentation
+│   └── ROOM_CONNECTIONS.md     # Detailed room connection docs
 ├── .github/workflows/ci.yml      # GitHub Actions CI/CD
+├── start.js                     # Project starter utility
 ├── README.md
 └── LICENSE
 ```
@@ -179,17 +253,45 @@ ProjectMood/
 ### Public Routes
 - `GET /` - API information
 - `GET /health` - Health check endpoint
+- `GET /api/health` - Enhanced health check with system status
+
+### Room Connection Routes
+- `POST /api/rooms/connect` - Connect two rooms together
+- `POST /api/rooms/disconnect` - Disconnect rooms
+- `POST /api/rooms/battle/start` - Start a DJ battle between rooms
+- `POST /api/rooms/battle/vote` - Vote in an active DJ battle
+- `GET /api/rooms/ambient/matches/:roomId` - Find compatible rooms
+- `POST /api/rooms/ambient/register` - Register room for ambient matching
+- `POST /api/rooms/ambient/request` - Request connection to a room
 
 ### Protected Routes (require Firebase JWT)
 - `GET /api/profile` - Get user profile from Firestore
 - `GET /api/users` - Get list of users (limited data)
 
 ### Socket.IO Events
+
+#### Original Events
 - `connection` - Client connects (with optional authentication)
 - `message` - Send/receive messages (enhanced with user info)
 - `join-room` - Join a specific room (authenticated users only)
 - `leave-room` - Leave a room (authenticated users only)
 - `disconnect` - Client disconnects
+
+#### Room Connection Events
+**Client → Server:**
+- `join-room` - Join a music room
+- `battle-vote` - Vote in a DJ battle
+- `request-connection` - Request room connection
+- `send-cross-room-message` - Send message to connected room
+
+**Server → Client:**
+- `room-connected` - Room connection established
+- `battle-started` - DJ battle has begun
+- `battle-vote-update` - Vote count updates
+- `battle-ended` - DJ battle finished with results
+- `ambient-match-found` - New compatible room discovered
+- `cross-room-message` - Message from connected room
+- `connection-request` - Incoming connection request
 
 ## 🔐 Authentication Flow
 
@@ -214,13 +316,33 @@ cd backend
 npm test
 ```
 
+**Room Connection Features:**
+```bash
+# Run comprehensive room connection tests
+node start.js run-tests
+
+# Run interactive demo
+node start.js run-demo
+
+# Check system health
+node start.js health-check
+```
+
 **Test Authentication:**
 ```bash
 # Test health endpoint
 curl http://localhost:3001/health
 
+# Test enhanced health endpoint
+curl http://localhost:3001/api/health
+
 # Test protected endpoint (requires valid JWT)
 curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:3001/api/profile
+
+# Test room connection (requires authentication)
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"sourceRoomId":"room1","targetRoomId":"room2","connectionType":"merge"}' \
+  http://localhost:3001/api/rooms/connect
 ```
 
 ## 🚀 Deployment
@@ -298,6 +420,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
    - Verify backend server is running
    - Check if CORS is properly configured for Socket.IO
    - Ensure authentication tokens are valid
+
+5. **Room connection issues**
+   - Verify MongoDB is running and connected
+   - Check Socket.IO client-server connection
+   - Ensure rooms exist before attempting connections
+
+6. **npm install issues with room connections**
+   - Use `--legacy-peer-deps` flag: `npm install --legacy-peer-deps`
+   - This resolves React version conflicts with Socket.IO
 
 ## � Privacy & GDPR Compliance
 

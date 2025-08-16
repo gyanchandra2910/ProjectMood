@@ -29,6 +29,8 @@ const {
 // API Routes
 const voiceRoutes = require('./routes/voiceRoutes');
 const faceRoutes = require('./routes/faceRoutes');
+const spotifyRoutes = require('./routes/spotifyRoutes');
+const musicRoutes = require('./routes/musicRoutes');
 
 const app = express();
 const server = http.createServer(app);
@@ -72,6 +74,8 @@ app.get('/health', (req, res) => {
 // API Routes - Voice and Face mood detection
 app.use('/api/voice', verifyFirebaseToken, voiceRoutes);
 app.use('/api/face', verifyFirebaseToken, faceRoutes);
+app.use('/api/spotify', spotifyRoutes);
+app.use('/api/music', musicRoutes);
 
 // API Routes
 app.get('/', optionalAuth, (req, res) => {

@@ -1,10 +1,16 @@
 // Room component with mood tracking, participant display, and real-time chat
 // Connects to Socket.IO for room management and messaging functionality
+// Includes MoodBubble visualization with real-time mood fusion
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import io from 'socket.io-client';
+import MoodBubble from './MoodBubble';
+import PlaylistPanel from './PlaylistPanel';
+import MoodMusicGenerator from './MoodMusicGenerator';
+import RoomConnectionPanel from './RoomConnectionPanel';
+import { useMoodFusion, useMoodVisualization } from '../hooks/useMoodFusion';
 
 const MOOD_OPTIONS = [
   { emoji: '😊', name: 'Happy', color: 'bg-yellow-100 border-yellow-300 text-yellow-700' },
@@ -31,6 +37,21 @@ const Room = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const messagesEndRef = useRef(null);
+
+  // MoodFusion integration
+  const {
+    fusedMood,
+    isLoading: moodLoading,
+    error: moodError,
+    lastUpdate,
+    saveMemory,
+    getMemories,
+    refresh: refreshMood,
+    participantCount,
+    hasValidMoods
+  } = useMoodFusion(roomId, participants, 1000); // Update every second
+
+  const visualMood = useMoodVisualization(fusedMood);
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -231,9 +252,9 @@ const Room = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-8 lg:grid-cols-5 gap-6">
           {/* Participants Panel */}
-          <div className="lg:col-span-1">
+          <div className="xl:col-span-1 lg:col-span-1">
             <div className="bg-white rounded-lg shadow-lg p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Participants ({participants.length})
@@ -253,7 +274,7 @@ const Room = () => {
                         {participant.userId === currentUser?.uid && ' (You)'}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {participant.isOnline ? 'Online' : 'Offline'}
+                        {participant.mood}
                       </p>
                     </div>
                     <div className="text-2xl">
@@ -283,11 +304,80 @@ const Room = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Mood Fusion Controls */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-sm font-medium text-gray-900">Room Mood</h4>
+                  <button
+                    onClick={refreshMood}
+                    disabled={moodLoading}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 disabled:opacity-50"
+                  >
+                    {moodLoading ? 'Updating...' : 'Refresh'}
+                  </button>
+                </div>
+                
+                <div className="text-xs text-gray-500 space-y-1">
+                  <div>Participants: {participantCount}</div>
+                  {lastUpdate && (
+                    <div>Updated: {lastUpdate.toLocaleTimeString()}</div>
+                  )}
+                  {moodError && (
+                    <div className="text-red-500">Error: {moodError}</div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => saveMemory('manual', ['user-saved'])}
+                  disabled={!hasValidMoods}
+                  className="mt-3 w-full text-xs bg-indigo-100 text-indigo-700 px-3 py-2 rounded hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Save Mood Memory
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Mood Visualization Panel */}
+          <div className="xl:col-span-1 lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-lg p-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 text-center">
+                Room Mood Orb
+              </h3>
+              
+              <div className="flex justify-center">
+                <MoodBubble
+                  moodVector={visualMood.vector}
+                  moodData={visualMood}
+                  size={{ width: 300, height: 300 }}
+                  className="rounded-lg"
+                  showLegend={true}
+                  enableControls={true}
+                />
+              </div>
+
+              {/* Mood Vector Display */}
+              <div className="mt-4 text-center">
+                <div className="text-xs text-gray-500 font-mono">
+                  Valence: {visualMood.vector.valence.toFixed(3)}<br/>
+                  Arousal: {visualMood.vector.arousal.toFixed(3)}
+                </div>
+                {hasValidMoods ? (
+                  <div className="text-xs text-green-600 mt-1">
+                    ✓ Active fusion from {participantCount} participants
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-400 mt-1">
+                    Waiting for participant moods...
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Chat Panel */}
-          <div className="lg:col-span-3">
+          <div className="xl:col-span-2 lg:col-span-3">
             <div className="bg-white rounded-lg shadow-lg flex flex-col h-96">
               {/* Messages */}
               <div className="flex-1 p-6 overflow-y-auto">
@@ -356,6 +446,53 @@ const Room = () => {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Music Playlist Panel */}
+          <div className="xl:col-span-2 lg:col-span-5 xl:row-span-1">
+            <div className="h-96 overflow-hidden">
+              <PlaylistPanel
+                roomId={roomId}
+                userId={currentUser?.uid}
+                onMoodChange={(newMood) => {
+                  // Handle mood changes from music
+                  console.log('Music mood change:', newMood);
+                }}
+              />
+            </div>
+          </div>
+
+          {/* AI Music Generator Panel */}
+          <div className="xl:col-span-1 lg:col-span-5">
+            <div className="h-96 overflow-hidden">
+              <MoodMusicGenerator
+                currentMood={fusedMood?.vector ? {
+                  valence: fusedMood.vector.valence,
+                  energy: fusedMood.vector.arousal, // Map arousal to energy
+                  danceability: 0.5 // Default value
+                } : null}
+                roomMoods={participants.map(p => ({
+                  valence: Math.random(), // In real implementation, get from participant mood
+                  energy: Math.random(),
+                  danceability: Math.random()
+                }))}
+                onTrackGenerated={(track) => {
+                  console.log('Track generated:', track);
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Room Connection Panel */}
+          <div className="xl:col-span-1 lg:col-span-5">
+            <div className="h-96 overflow-hidden">
+              <RoomConnectionPanel
+                roomId={roomId}
+                userId={currentUser?.uid}
+                currentMood={fusedMood}
+                socket={socket}
+              />
             </div>
           </div>
         </div>

@@ -1,0 +1,69 @@
+{
+  "timestamp": "2025-08-16T10:38:23.662Z",
+  "baseUrl": "http://localhost:3001",
+  "summary": {
+    "total": 10,
+    "passed": 0,
+    "failed": 10,
+    "successRate": "0.0"
+  },
+  "results": [
+    {
+      "test": "Health Check Endpoint",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Mood Fusion Examples Endpoint",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Basic Mood Fusion",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Complex Mood Fusion",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Stage 4: Calm + Excited Fusion",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Stage 4: Sad + Anxious Fusion",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Invalid Input Handling",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Unknown Mood Handling",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Room Memory System Integration",
+      "status": "FAIL",
+      "details": ""
+    },
+    {
+      "test": "Performance Test",
+      "status": "FAIL",
+      "details": ""
+    }
+  ],
+  "endpoints": {
+    "health": "✅ Tested",
+    "moodFusion": "✅ Tested with multiple scenarios",
+    "examples": "✅ Tested",
+    "memorySystem": "🔄 Structure validated",
+    "errorHandling": "✅ Tested"
+  }
+}
