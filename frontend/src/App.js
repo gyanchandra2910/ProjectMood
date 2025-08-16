@@ -1,37 +1,42 @@
-// Create a React app with Socket.IO integration and Tailwind CSS styling
-// This component demonstrates real-time communication with the backend server
+// Main App component with authentication and routing
+// Integrates Firebase Auth with React Router and Socket.IO
 
-import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './components/Login';
+import Profile from './components/Profile';
 import Home from './components/Home';
 
 function App() {
-  const [socket, setSocket] = useState(null);
-  const [connected, setConnected] = useState(false);
-
-  useEffect(() => {
-    // Connect to Socket.IO server
-    const newSocket = io('http://localhost:3001');
-    
-    newSocket.on('connect', () => {
-      console.log('Connected to server');
-      setConnected(true);
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('Disconnected from server');
-      setConnected(false);
-    });
-
-    setSocket(newSocket);
-
-    return () => newSocket.close();
-  }, []);
-
   return (
-    <div className="App">
-      <Home socket={socket} connected={connected} />
-    </div>
+    <Router>
+      <AuthProvider>
+        <div className="App">
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route 
+              path="/" 
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </AuthProvider>
+    </Router>
   );
 }
 
