@@ -1,0 +1,542 @@
+/**
+ * Consent Dialog Styles
+ * Accessible and responsive design for privacy consent management
+ */
+
+.consent-dialog-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.consent-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  overflow: hidden;
+  animation: slideInUp 0.3s ease-out;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .consent-dialog {
+    background: #1a1a1a;
+    color: #ffffff;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.consent-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-dialog-header {
+    border-bottom-color: #374151;
+  }
+}
+
+.consent-dialog-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+}
+
+.consent-dialog-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  padding: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.consent-dialog-close:hover,
+.consent-dialog-close:focus {
+  background-color: rgba(255, 255, 255, 0.2);
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.consent-dialog-content {
+  padding: 2rem;
+  max-height: calc(90vh - 140px);
+  overflow-y: auto;
+}
+
+.consent-dialog-intro {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #3b82f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-dialog-intro {
+    background-color: #374151;
+    border-left-color: #60a5fa;
+  }
+}
+
+.consent-dialog-intro p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-dialog-intro p {
+    color: #d1d5db;
+  }
+}
+
+.consent-features {
+  margin-bottom: 2rem;
+}
+
+.consent-feature {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-feature {
+    border-color: #374151;
+    background-color: #111827;
+  }
+}
+
+.consent-feature-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.consent-feature-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-feature-title {
+    color: #f9fafb;
+  }
+}
+
+.consent-feature-toggle {
+  background: none;
+  border: 1px solid #d1d5db;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.consent-feature-toggle:hover,
+.consent-feature-toggle:focus {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  outline: 2px solid rgba(59, 130, 246, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-feature-toggle {
+    border-color: #4b5563;
+    color: #9ca3af;
+  }
+  
+  .consent-feature-toggle:hover,
+  .consent-feature-toggle:focus {
+    border-color: #60a5fa;
+    color: #60a5fa;
+  }
+}
+
+.consent-feature-description {
+  margin: 0 0 1rem 0;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-feature-description {
+    color: #9ca3af;
+  }
+}
+
+.consent-feature-details {
+  margin: 1rem 0;
+  padding: 1rem;
+  background-color: #f1f5f9;
+  border-radius: 6px;
+  animation: slideDown 0.2s ease-out;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-feature-details {
+    background-color: #1f2937;
+  }
+}
+
+.consent-detail-section {
+  margin-bottom: 1rem;
+}
+
+.consent-detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.consent-detail-section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-detail-section h4 {
+    color: #d1d5db;
+  }
+}
+
+.consent-detail-section p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-detail-section p {
+    color: #9ca3af;
+  }
+}
+
+.consent-feature-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.consent-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.consent-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.consent-checkbox-label input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid #d1d5db;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.consent-checkbox-label input[type="checkbox"]:checked {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.consent-checkbox-label input[type="checkbox"]:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+.consent-checkbox-text {
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-checkbox-text {
+    color: #d1d5db;
+  }
+}
+
+.consent-help-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-left: 1.625rem;
+  line-height: 1.4;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-help-text {
+    color: #9ca3af;
+  }
+}
+
+.consent-dialog-info {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #eff6ff;
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-dialog-info {
+    background-color: #1e3a8a;
+    border-color: #3b82f6;
+  }
+}
+
+.consent-dialog-info h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-dialog-info h3 {
+    color: #93c5fd;
+  }
+}
+
+.consent-dialog-info ul {
+  margin: 0 0 1rem 0;
+  padding-left: 1.5rem;
+  color: #1e40af;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-dialog-info ul {
+    color: #bfdbfe;
+  }
+}
+
+.consent-dialog-info li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.consent-privacy-link {
+  color: #3b82f6;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.consent-privacy-link:hover,
+.consent-privacy-link:focus {
+  color: #1d4ed8;
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-privacy-link {
+    color: #60a5fa;
+  }
+  
+  .consent-privacy-link:hover,
+  .consent-privacy-link:focus {
+    color: #93c5fd;
+  }
+}
+
+.consent-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-dialog-actions {
+    border-top-color: #374151;
+    background-color: #111827;
+  }
+}
+
+.consent-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-size: 0.875rem;
+  min-width: 120px;
+}
+
+.consent-button:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.5);
+  outline-offset: 2px;
+}
+
+.consent-button-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.consent-button-primary:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+.consent-button-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.consent-button-secondary {
+  background-color: transparent;
+  color: #6b7280;
+  border: 1px solid #d1d5db;
+}
+
+.consent-button-secondary:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+@media (prefers-color-scheme: dark) {
+  .consent-button-secondary {
+    color: #9ca3af;
+    border-color: #4b5563;
+  }
+  
+  .consent-button-secondary:hover {
+    background-color: #374151;
+    color: #d1d5db;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .consent-dialog {
+    width: 95%;
+    margin: 1rem;
+  }
+  
+  .consent-dialog-header {
+    padding: 1rem 1.5rem;
+  }
+  
+  .consent-dialog-title {
+    font-size: 1.25rem;
+  }
+  
+  .consent-dialog-content {
+    padding: 1.5rem;
+  }
+  
+  .consent-feature {
+    padding: 1rem;
+  }
+  
+  .consent-dialog-actions {
+    flex-direction: column;
+    padding: 1rem 1.5rem;
+  }
+  
+  .consent-button {
+    width: 100%;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .consent-dialog {
+    border: 3px solid #000;
+  }
+  
+  .consent-button-primary {
+    border: 2px solid #fff;
+  }
+  
+  .consent-button-secondary {
+    border: 2px solid #000;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .consent-dialog-backdrop,
+  .consent-dialog,
+  .consent-feature-details {
+    animation: none;
+  }
+  
+  .consent-button,
+  .consent-feature-toggle,
+  .consent-checkbox-label input {
+    transition: none;
+  }
+}
