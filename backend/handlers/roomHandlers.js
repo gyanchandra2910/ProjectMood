@@ -214,16 +214,23 @@ const handleUpdateMood = async (socket, data) => {
       return;
     }
 
-    const { roomId, mood } = data;
+    const { roomId, mood, moodSource = 'manual', confidence = 1.0 } = data;
     
     if (!roomId || !mood) {
       socket.emit('error', { message: 'Room ID and mood are required' });
       return;
     }
 
-    const validMoods = ['😊', '😢', '😠', '😴', '🤔', '😍', '🤯', '🎉'];
+    const validMoods = ['😊', '😢', '😠', '😴', '🤔', '😍', '🤯', '🎉', 'happy', 'sad', 'angry', 'sleepy', 'thoughtful', 'excited', 'surprised', 'calm', 'neutral'];
+    const validSources = ['manual', 'voice', 'face'];
+    
     if (!validMoods.includes(mood)) {
       socket.emit('error', { message: 'Invalid mood' });
+      return;
+    }
+
+    if (!validSources.includes(moodSource)) {
+      socket.emit('error', { message: 'Invalid mood source' });
       return;
     }
 
@@ -235,18 +242,28 @@ const handleUpdateMood = async (socket, data) => {
       return;
     }
 
-    await room.updateParticipantMood(socket.user.uid, mood);
+    await room.updateParticipantMood(socket.user.uid, mood, moodSource, confidence);
 
-    console.log(`User ${socket.user.email} updated mood to ${mood} in room: ${roomId}`);
+    console.log(`User ${socket.user.email} updated mood to ${mood} (${moodSource}, ${Math.round(confidence * 100)}%) in room: ${roomId}`);
 
     // Broadcast mood update to all participants
-    socket.to(roomId).emit('room:update', {
-      roomId,
-      participants: room.participants.filter(p => p.isOnline),
-      messages: room.getRecentMessages()
+    const updatedParticipant = room.participants.find(p => p.userId === socket.user.uid);
+    
+    socket.to(roomId).emit('participantMoodUpdated', {
+      userId: socket.user.uid,
+      mood,
+      moodSource,
+      confidence,
+      timestamp: new Date().toISOString()
     });
 
-    socket.emit('mood:updated', { roomId, mood });
+    socket.emit('mood:updated', { 
+      roomId, 
+      mood, 
+      moodSource, 
+      confidence,
+      timestamp: new Date().toISOString()
+    });
 
   } catch (error) {
     console.error('Error updating mood:', error);

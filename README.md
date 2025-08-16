@@ -4,13 +4,27 @@ A real-time communication application built with React, Tailwind CSS, Node.js, E
 
 ## 🚀 Features
 
+### Core Features
 - **🔐 Firebase Authentication**: Email/password and Google sign-in
 - **👤 User Profiles**: Personalized profiles stored in Firestore
-- **💬 Real-time Messaging**: Authenticated instant communication using Socket.IO
+- **🏠 Room System**: Create and join mood-sharing rooms with real-time updates
+- **💬 Real-time Chat**: Authenticated instant messaging using Socket.IO
+- **😊 Traditional Mood Selection**: 8 emoji-based mood options
+
+### Stage 3: Advanced AI-Powered Mood Detection
+- **🎤 Voice Mood Analysis**: 6-second audio recording with emotion detection
+- **📷 Face Emotion Recognition**: Camera-based facial expression analysis
+- **🔒 GDPR-Compliant Privacy**: Comprehensive consent management system
+- **🤖 AI Integration Ready**: Extensible architecture for Whisper API and computer vision
+- **📊 Mood Confidence Tracking**: AI-generated confidence scores for detected emotions
+- **🛡️ Privacy-First Design**: Local processing with optional server enhancement
+
+### Technical Features
 - **🎨 Modern UI**: Clean and responsive design with Tailwind CSS
 - **🛡️ Secure Backend**: Firebase JWT validation middleware
 - **🚀 CI/CD Ready**: GitHub Actions workflow included
 - **📊 Health Monitoring**: Built-in health check endpoints
+- **📱 Progressive Enhancement**: Graceful fallbacks for unsupported features
 
 ## 📋 Prerequisites
 
@@ -285,7 +299,44 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
    - Check if CORS is properly configured for Socket.IO
    - Ensure authentication tokens are valid
 
-## 📞 Support
+## � Privacy & GDPR Compliance
+
+ProjectMood takes user privacy seriously and implements GDPR-compliant features:
+
+### Privacy Features
+- **🛡️ Consent Management**: Clear opt-in for camera and microphone access
+- **📋 Granular Permissions**: Session-only vs. persistent data storage options
+- **🗑️ Data Deletion**: Users can request deletion of all stored data
+- **📤 Data Export**: GDPR-compliant data portability features
+- **🔄 Withdrawal Rights**: Users can withdraw consent at any time
+
+### Data Processing
+- **🏠 Local-First**: Face detection runs client-side by default
+- **🎤 Audio Privacy**: Voice recordings processed and deleted immediately
+- **📷 Image Privacy**: Photos never stored unless explicitly consented
+- **📊 Anonymized Analytics**: Only aggregated, non-personal data stored
+
+### Default Settings
+- Audio files: **Not stored** (processing only)
+- Face images: **Not stored** (local processing)
+- Mood data: **Session-only** unless user opts for personalization
+
+## 🤖 AI Integration (Optional)
+
+The application is designed to be enhanced with third-party AI services:
+
+### Voice Processing
+- **OpenAI Whisper**: Speech-to-text and emotion analysis
+- **Google Speech API**: Alternative speech recognition
+- **Custom Models**: Extensible for any speech processing API
+
+### Computer Vision
+- **Google Vision API**: Advanced facial emotion detection
+- **Azure Face API**: Microsoft's emotion recognition service
+- **AWS Rekognition**: Amazon's computer vision platform
+- **face-api.js**: Client-side face detection library
+
+## �📞 Support
 
 If you have any questions or need help:
 1. Check the troubleshooting section above

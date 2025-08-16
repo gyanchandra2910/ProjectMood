@@ -26,6 +26,10 @@ const {
   handleDisconnect
 } = require('./handlers/roomHandlers');
 
+// API Routes
+const voiceRoutes = require('./routes/voiceRoutes');
+const faceRoutes = require('./routes/faceRoutes');
+
 const app = express();
 const server = http.createServer(app);
 
@@ -64,6 +68,10 @@ app.get('/health', (req, res) => {
     mongodb: require('mongoose').connection.readyState === 1 ? 'Connected' : 'Disconnected'
   });
 });
+
+// API Routes - Voice and Face mood detection
+app.use('/api/voice', verifyFirebaseToken, voiceRoutes);
+app.use('/api/face', verifyFirebaseToken, faceRoutes);
 
 // API Routes
 app.get('/', optionalAuth, (req, res) => {

@@ -22,8 +22,19 @@ const participantSchema = new mongoose.Schema({
   },
   mood: {
     type: String,
-    enum: ['😊', '😢', '😠', '😴', '🤔', '😍', '🤯', '🎉'],
+    enum: ['😊', '😢', '😠', '😴', '🤔', '😍', '🤯', '🎉', 'happy', 'sad', 'angry', 'sleepy', 'thoughtful', 'excited', 'surprised', 'calm', 'neutral'],
     default: '😊'
+  },
+  moodSource: {
+    type: String,
+    enum: ['manual', 'voice', 'face'],
+    default: 'manual'
+  },
+  confidence: {
+    type: Number,
+    min: 0,
+    max: 1,
+    default: 1.0
   },
   joinedAt: {
     type: Date,
@@ -150,10 +161,12 @@ roomSchema.methods.removeParticipant = function(userId) {
   return this.save();
 };
 
-roomSchema.methods.updateParticipantMood = function(userId, mood) {
+roomSchema.methods.updateParticipantMood = function(userId, mood, moodSource = 'manual', confidence = 1.0) {
   const participant = this.participants.find(p => p.userId === userId);
   if (participant) {
     participant.mood = mood;
+    participant.moodSource = moodSource;
+    participant.confidence = confidence;
     participant.lastSeen = new Date();
   }
   

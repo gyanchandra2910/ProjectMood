@@ -9,7 +9,7 @@ import Login from './components/Login';
 import Profile from './components/Profile';
 import Home from './components/Home';
 import Rooms from './components/Rooms';
-import Room from './components/Room';
+import EnhancedRoom from './components/EnhancedRoom';
 
 function App() {
   return (
@@ -46,7 +46,7 @@ function App() {
               path="/room/:roomId" 
               element={
                 <ProtectedRoute>
-                  <Room />
+                  <EnhancedRoom />
                 </ProtectedRoute>
               } 
             />
